@@ -4,6 +4,7 @@ import boto3
 import os
 import sys
 import uuid
+import subprocess
 from PIL import Image
 import PIL.Image
 
@@ -27,10 +28,17 @@ def handler(event, context):
         response = s3_client.head_object(Bucket=bucket, Key=key)
         type = response['ContentType']
 
-        if type not in ['image/png', 'image/jpg', 'image/jpeg']:
-          print(type, 'is not supported')
+        if type in ['image/png', 'image/jpg', 'image/jpeg']:
+          transfer.download_file(bucket, key, download_path)
+          resize_image(download_path, upload_path)
+          transfer.upload_file(upload_path, '{}-thumbs'.format(bucket), key, extra_args={'ContentType': 'image/jpeg'})
           continue
 
-        transfer.download_file(bucket, key, download_path)
-        resize_image(download_path, upload_path)
-        transfer.upload_file(upload_path, '{}-thumbs'.format(bucket), key, extra_args={'ContentType': 'image/jpeg'})
+        if type in ['video/mp4']:
+          transfer.download_file(bucket, key, download_path)
+          cmd = './ffmpeg -i "{}" -vframes 1 -vf scale=200:-1 {}'.format(download_path, upload_path)
+          subprocess.call(cmd, shell=True)
+          transfer.upload_file(upload_path, '{}-thumbs'.format(bucket), key, extra_args={'ContentType': 'image/jpeg'})
+          continue
+
+        print(type, 'is not supported')
