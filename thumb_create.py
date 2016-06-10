@@ -34,7 +34,7 @@ def handler(event, context):
           transfer.upload_file(upload_path, '{}-thumbs'.format(bucket), key, extra_args={'ContentType': 'image/jpeg'})
           continue
 
-        if type in ['video/mp4']:
+        if type in ['video/mp4', 'video/quicktime']:
           transfer.download_file(bucket, key, download_path)
           cmd = './ffmpeg -i "{}" -vframes 1 -vf scale=200:-1 {}'.format(download_path, upload_path)
           subprocess.call(cmd, shell=True)
