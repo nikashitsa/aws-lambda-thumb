@@ -1,4 +1,3 @@
-from __future__ import print_function
 import boto3
 
 s3_client = boto3.client('s3')

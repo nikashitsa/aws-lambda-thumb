@@ -1,4 +1,3 @@
-from __future__ import print_function
 from boto3.s3.transfer import S3Transfer
 import boto3
 import os
@@ -15,6 +14,7 @@ thumb_size = 200, 200
 def resize_image(image_path, resized_path):
     with Image.open(image_path) as image:
         image.thumbnail(thumb_size)
+        image = image.convert('RGB')
         image.save(resized_path)
 
 def handler(event, context):
@@ -36,7 +36,7 @@ def handler(event, context):
 
         if type in ['video/mp4', 'video/quicktime']:
           transfer.download_file(bucket, key, download_path)
-          cmd = './ffmpeg -i "{}" -vframes 1 -vf scale=200:-1 {}'.format(download_path, upload_path)
+          cmd = 'ffmpeg -i "{}" -vframes 1 -vf scale=200:-1 {}'.format(download_path, upload_path)
           subprocess.call(cmd, shell=True)
           transfer.upload_file(upload_path, '{}-thumbs'.format(bucket), key, extra_args={'ContentType': 'image/jpeg'})
           continue

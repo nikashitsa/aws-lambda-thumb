@@ -1,5 +1,5 @@
 # aws-lambda-thumb
-AWS Lambda. Creates/removes thumbnails via Python. 8x faster than nodejs.
+AWS Lambda. Creates/removes thumbnails via Python 3.8. 8x faster than nodejs.
 
 `thumb_create` function creates thumbnail in thumbnails bucket when original image is uploaded.
 
@@ -12,7 +12,10 @@ AWS Lambda. Creates/removes thumbnails via Python. 8x faster than nodejs.
 ```
 ./pack.sh thumb_create
 ./pack.sh thumb_delete
+./pack.sh python_layer # (requires virtualenv & docker)
+./pack.sh ffmpeg_layer # (requires wget)
 ```
+4. Add python and ffmpeg layers to thumb_create function.
 
 Handlers will be `thumb_create.handler` and `thumb_delete.handler` for lambda functions.
 
